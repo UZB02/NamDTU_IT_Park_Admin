@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@import 'primeicons/primeicons.css';
+
+@tailwind utilities;
+
+*{
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+}
+.container{
+    max-width: 1400px;
+    margin: 0 auto;
+}
