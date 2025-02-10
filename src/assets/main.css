@@ -13,3 +13,13 @@
     max-width: 1400px;
     margin: 0 auto;
 }
+
+#toast {
+  width: 80%;
+}
+
+@media screen and (min-width: 768px) {
+  #toast {
+    width: 400px;
+  }
+}

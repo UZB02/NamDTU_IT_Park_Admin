@@ -1,10 +1,14 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import axios from 'axios'
-import AppLayout from '.././layouts/AppLayout.vue'
-import AuthLayout from '.././layouts/AuthLayouts/AuthLayout.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import HomeView from "../views/HomeView.vue";
+import axios from "axios";
+import AppLayout from ".././layouts/AppLayout.vue";
+import AuthLayout from ".././layouts/AuthLayouts/AuthLayout.vue";
 axios.defaults.baseURL = "https://namdtu-backend.onrender.com";
-axios.defaults.headers.common["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
+// axios.defaults.baseURL = "http://localhost:5000";
+
+axios.defaults.headers.common["Authorization"] = `Bearer ${localStorage.getItem(
+  "token"
+)}`;
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,7 +39,7 @@ const router = createRouter({
     {
       path: "/login",
       name: "LoginView",
-      meta:{
+      meta: {
         layout: AuthLayout,
       },
       component: () => import("../views/LoginView.vue"),
@@ -43,4 +47,4 @@ const router = createRouter({
   ],
 });
 
-export default router
+export default router;

@@ -9,7 +9,7 @@
           <Avatar
             @click="toggle"
             class="cursor-pointer"
-            image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+            image="https://d1nhio0ox7pgb.cloudfront.net/_img/v_collection_png/512x512/shadow/user.png"
             shape="circle"
           />
           <TieredMenu ref="menu" id="overlay_tmenu" :model="items" popup />
@@ -62,6 +62,9 @@ const items = ref([
   {
     label: "Sign Out",
     icon: "pi pi-sign-out",
+    command: ()=>{
+      signOut()
+    },
   },
 ]);
 watchEffect(() => {
@@ -69,6 +72,12 @@ watchEffect(() => {
     items.value[0].label = admin.value.username;
   }
 });
+
+function signOut(){
+  localStorage.removeItem("adminID");
+  localStorage.removeItem("token");
+  router.push("/login");
+}
 
 const toggle = (event) => {
   menu.value.toggle(event);

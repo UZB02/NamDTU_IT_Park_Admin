@@ -107,10 +107,11 @@ function login() {
 }
 </script>
 
-<style>
+<style scoped>
 label {
   color: white;
 }
+
 #toast {
   width: 80%;
 }
