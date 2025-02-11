@@ -4,7 +4,7 @@
             <div class="top w-full">
                 <div class="text-2xl text-slate-500"><span @click="router.push('/admins')" class="cursor-pointer text-green-500 font-semibold">Admins</span> / <span class="font-semibold">Add Admin</span></div>
             </div>
-            <div class="bottom w-full">
+            <div class="bottom w-full  flex items-center justify-center">
                 <AddAdminCard />
             </div>
         </div>

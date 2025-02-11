@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-3">
+  <div class="flex flex-col gap-3 bg-slate-100 w-full rounded-2xl" style="padding: 30px;">
     <Toast id="toast"></Toast>
     <span class="grid md:grid-cols-2 grid-cols-1 gap-2.5">
       <div class="flex flex-col gap-2">
@@ -34,7 +34,7 @@
           type="password"
           v-model="password"
           id="password"
-          class="border border-slate-300 outline-0 rounded shadow"
+          class="border border-slate-300 bg-white transition hover:border-slate-500 outline-0 rounded shadow"
           style="padding: 8px"
         />
       </div>

@@ -9,15 +9,17 @@
         class="top w-full flex items-center justify-between"
         style="padding: 0 10px"
       >
-        <div class="left flex items-center justify-center gap-3">
-          <h1 class="text-3xl font-bold">Admins</h1>
-          <Button
+        <div class="left text-xl md:text-[24px] text-slate-400 flex items-center justify-center gap-3">
+          <h1 @click="router.push('/')" class="text-xl md:text-[28px] text-green-500 font-bold cursor-pointer">Home</h1> /
+          <h1 class="text-xl md:text-[24px] text-slate-400 font-bold">Admins</h1>
+        </div>
+        <div class="right flex items-center justify-center gap-3">
+           <Button
             @click="router.push('/admins/add')"
             label="Add Admin"
             severity="success"
+            
           />
-        </div>
-        <div class="right flex items-center justify-center gap-3">
           <i
             class="pi cursor-pointer transition-all hover:scale-105 pi-th-large"
           ></i>
@@ -30,7 +32,7 @@
         <div
           v-for="item in formattedAdmins"
           :key="item.id"
-          class="card bg-slate-100/50 rounded-2xl"
+          class="card bg-white shadow transition-all duration-150 hover:bg-slate-50 rounded-2xl"
         >
           <span class="flex items-center justify-center">
             <img
@@ -198,8 +200,13 @@ function getAdminById(id) {
 }
 
 function updateAdmin() {
-  isLoading.value = true;
-  axios
+    isLoading.value = true;
+  if(!editAdminUsername.value || !editAdminUserSecondname.value || !editAdminEmail.value) {
+    isLoading.value = false;
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Ma\'lumotlarni to\'liq kiriting', life: 3000 });
+    return;
+  }else{
+     axios
     .put(
       `/api/admin/${admin_id.value}`,{
         username: editAdminUsername.value,
@@ -208,15 +215,20 @@ function updateAdmin() {
       }
     )
     .then((response) => {
-      console.log(response.data);
-      getAdmins();
+      if(response.status==200){
+        toast.add({ severity:'success', summary: 'Success', detail: 'Admin o\'zgartirildi', life:3000 });
+        console.log(response.data);
+        getAdmins();
+        isLoading.value = false;
+        visible.value = false;
+      }
       isLoading.value = false;
-      visible.value = false;
     })
     .catch((err) => {
       isLoading.value = false;
       console.log(err);
     });
+  }
 }
 
 function deleteAdmins() {
@@ -225,6 +237,7 @@ function deleteAdmins() {
     .delete(`/api/admin/${admin_id.value}`)
     .then((response) => {
       console.log(response.data);
+      toast.add({ severity:'success', summary: 'Success', detail: 'Admin o\'chirildi', life:3000 });
       getAdmins();
     })
     .catch((err) => {
