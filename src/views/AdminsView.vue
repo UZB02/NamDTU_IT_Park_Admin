@@ -20,18 +20,20 @@
             severity="success"
             
           />
-          <i
+          <i @click="coursORTable()"
             class="pi cursor-pointer transition-all hover:scale-105 pi-th-large"
           ></i>
-          <i
+          <i @click="coursORTable()"
             class="pi cursor-pointer transition-all hover:scale-105 pi-table"
           ></i>
         </div>
       </div>
-      <div class="bottom grid md:grid-cols-3 grid-cols-1 gap-3">
-        <div
+      <div class="bottom grid grid-cols-1 w-full gap-3">
+        <div class="grid md:grid-cols-3 grid-cols-1 w-full gap-3">
+          <div
           v-for="item in formattedAdmins"
           :key="item.id"
+          :class="cardORtable ? 'hidden' : ''"
           class="card bg-white shadow transition-all duration-150 hover:bg-slate-50 rounded-2xl"
         >
           <span class="flex items-center justify-center">
@@ -64,6 +66,10 @@
               {{ item.formattedDate }}</span
             >
           </span>
+        </div>
+        </div>
+        <div :class="cardORtable ? ' bg-red-600' : 'hidden'">
+          <TableComponent></TableComponent>
         </div>
         <Menu ref="menu" :model="overlayMenuItems" :popup="true" />
       </div>
@@ -138,6 +144,7 @@ import Menu from "primevue/menu";
 import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
 import Loading from "../components/Loading/Main.vue"
+import TableComponent from '../components/AdminCard/AdminTable.vue'
 
 import Toast from "primevue/toast";
 import ConfirmDialog from "primevue/confirmdialog";
@@ -147,6 +154,7 @@ import { useToast } from "primevue/usetoast";
 const confirm = useConfirm();
 const toast = useToast();
 
+const cardORtable=ref(false)
 const visible = ref(false);
 const menu = ref(null);
 const admin_id = ref();
@@ -173,6 +181,10 @@ const overlayMenuItems = [
     },
   },
 ];
+
+function coursORTable(){
+  cardORtable.value =!cardORtable.value
+}
 
 const toggle = (event) => {
   menu.value.toggle(event);
