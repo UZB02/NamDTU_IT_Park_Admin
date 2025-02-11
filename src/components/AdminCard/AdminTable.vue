@@ -78,12 +78,15 @@ function editAdmin(admin) {
 
 // Delete funksiyasi
 async function deleteAdmin() {
-  if (!confirm("Haqiqatan ham o‘chirmoqchimisiz?")) return;
-
   try {
     await axios.delete(`/api/admin/${adminID.value}`);
     admins.value = admins.value.filter((admin) => admin._id !== adminID.value);
-    console.log("O‘chirildi:", adminID.value);
+    toast.add({
+        severity: "success",
+        summary: "Success",
+        detail: "Admin O'chirildi",
+        life: 3000,
+      });
   } catch (error) {
     console.error("O‘chirishda xatolik:", error);
   }
@@ -106,12 +109,6 @@ const confirm1 = (id) => {
       severity: "danger",
     },
     accept: () => {
-      toast.add({
-        severity: "success",
-        summary: "Success",
-        detail: "Admin O'chirildi",
-        life: 3000,
-      });
       deleteAdmin();
     },
   });
