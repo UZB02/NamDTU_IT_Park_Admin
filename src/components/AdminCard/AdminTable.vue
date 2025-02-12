@@ -12,7 +12,7 @@
           <button @click="editAdmin(slotProps.data)" class="p-button p-button-sm p-button-text">
             <i class="pi pi-pencil text-slate-400"></i>
           </button>
-          <button @click="confirm1(slotProps.data._id)" class="p-button p-button-sm p-button-text">
+          <button @click="(event) => confirm2(event, slotProps.data._id)"  class="p-button p-button-sm p-button-text">
             <i class="pi pi-trash text-slate-400"></i>
           </button>
         </template>
@@ -20,7 +20,7 @@
     </DataTable>
   </div>
     <Toast id="toast"></Toast>
-      <ConfirmDialog></ConfirmDialog>
+         <ConfirmPopup></ConfirmPopup>
 </template>
 
 <script setup>
@@ -28,12 +28,13 @@ import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import Button from "primevue/button";
 
 
 import Toast from "primevue/toast";
-import ConfirmDialog from "primevue/confirmdialog";
-import { useConfirm } from "primevue/useconfirm";
+import ConfirmPopup from 'primevue/confirmpopup';
 import { useToast } from "primevue/usetoast";
+import { useConfirm } from "primevue/useconfirm";
 
 const confirm = useConfirm();
 const toast = useToast();
@@ -92,26 +93,26 @@ async function deleteAdmin() {
   }
 }
 
-const confirm1 = (id) => {
-     adminID.value=id
-  confirm.require({
-    message: "Do you want to delete this record?",
-    header: "Danger Zone",
-    icon: "pi pi-info-circle",
-    rejectLabel: "Cancel",
-    rejectProps: {
-      label: "Cancel",
-      severity: "secondary",
-      outlined: true,
-    },
-    acceptProps: {
-      label: "Delete",
-      severity: "danger",
-    },
-    accept: () => {
-      deleteAdmin();
-    },
-  });
+const confirm2 = (event, id) => {
+    adminID.value = id; // O'chirish uchun ID ni saqlab qo'yamiz
+    confirm.require({
+        target: event.target, // Target qo'shildi
+        message: 'Do you want to delete this record?',
+        icon: 'pi pi-info-circle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: deleteAdmin, // Adminni o'chirish
+        reject: () => {
+            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        }
+    });
 };
 </script>
 
