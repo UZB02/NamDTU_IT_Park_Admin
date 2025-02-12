@@ -91,7 +91,6 @@
           </div>
         </div>
       </Dialog>
-      <Toast id="toast"></Toast>
       <ConfirmDialog></ConfirmDialog>
       <Menu ref="menu" :model="overlayMenuItems" :popup="true" />
       <Loading :class="dataLoading ? '' : 'hidden'"/>
@@ -100,16 +99,15 @@
 import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
 import axios from "axios";
-import { ref, computed } from "vue";
-
+import { ref, computed, defineProps } from "vue";
 import Button from "primevue/button";
 import Menu from "primevue/menu";
-import Toast from "primevue/toast";
 import ConfirmDialog from "primevue/confirmdialog";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import Loading from '../Loading/Main.vue'
 
+// defineProps(["admins", "getAdmins"]);
 const confirm = useConfirm();
 const toast = useToast();
 const visible = ref(false);
@@ -197,7 +195,7 @@ function updateAdmin() {
   }
 }
 
-function deleteAdmins() {
+function deleteAdmin() {
   console.log(5569);
   axios
     .delete(`/api/admin/${admin_id.value}`)
@@ -225,7 +223,7 @@ function getAdmins() {
 }
 getAdmins();
 
-// Har bir adminning sanasini formatlash
+
 const formattedAdmins = computed(() => {
   return admins.value.map((admin) => ({
     ...admin,
@@ -255,13 +253,7 @@ const confirm2 = () => {
       severity: "danger",
     },
     accept: () => {
-      toast.add({
-        severity: "success",
-        summary: "Success",
-        detail: "Admin O'chirildi",
-        life: 3000,
-      });
-      deleteAdmins();
+      deleteAdmin();
     },
   });
 };

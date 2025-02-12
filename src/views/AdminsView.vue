@@ -30,10 +30,10 @@
       </div>
       <div class="bottom grid grid-cols-1 w-full gap-3">
         <div class="w-full" :class="cardORtable ? 'hidden' : ''">
-         <AdminCard></AdminCard>
+         <AdminCard :admins="admins"></AdminCard>
         </div>
         <div :class="cardORtable ? '' : 'hidden'">
-          <TableComponent></TableComponent>
+          <TableComponent :admins="admins"></TableComponent>
         </div>
       </div>
       </div>
@@ -42,17 +42,32 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref,onMounted } from "vue";
 import Button from "primevue/button";
 import router from "@/router";
+// import axios from "axios";
 
 import AdminCard from "@/components/AdminCard/AdminCard.vue";
 import TableComponent from '../components/AdminCard/AdminTable.vue'
+
 const cardORtable=ref(false)
 
 function coursORTable(){
   cardORtable.value =!cardORtable.value
 }
+
+// const admins = ref([]); // Adminlar ro‘yxati
+
+// async function getAdmins() {
+//   try {
+//     const response = await axios.get("/api/admin");
+//     admins.value = response.data;
+//     console.log("Adminlar:", admins.value);
+//   } catch (err) {
+//     console.error("Xatolik:", err);
+//   }
+// }
+// onMounted(getAdmins);
 
 </script>
 

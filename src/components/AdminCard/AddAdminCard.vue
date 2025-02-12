@@ -40,7 +40,7 @@
       </div>
     </span>
     <span class="grid md:grid-cols-2 grid-cols-1 gap-2.5">
-      <Button @click="addAdmin()" :label="isLoading ? 'Loading...' : 'Add'" severity="success" />
+      <Button @click="addAdmin()" :label="isLoading ? 'Loading...' : 'Add'" :disabled="isLoading" severity="success" />
       <Button @click="router.push('/admins')" label="Cancel" severity="danger" />
     </span>
   </div>

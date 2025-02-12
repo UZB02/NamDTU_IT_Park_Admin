@@ -1,12 +1,15 @@
 <template>
   <div class="w-full">
     <DataTable :value="formattedAdmins" stripedRows tableStyle="width: 100%">
+       <Column header="ID">
+        <template #body="slotProps">
+          {{ slotProps.data.order }}
+        </template>
+      </Column>
       <Column field="username" header="Name"></Column>
       <Column field="usersecondname" header="Lastname"></Column>
       <Column field="email" header="Email"></Column>
       <Column field="formattedDate" header="Created At"></Column>
-
-      <!-- Edit & Delete Tugmalari -->
       <Column header="Actions">
         <template #body="slotProps">
           <button @click="editAdmin(slotProps.data)" class="p-button p-button-sm p-button-text">
@@ -20,7 +23,6 @@
     </DataTable>
   </div>
     <Toast id="toast"></Toast>
-         <ConfirmPopup></ConfirmPopup>
 </template>
 
 <script setup>
@@ -32,7 +34,6 @@ import Button from "primevue/button";
 
 
 import Toast from "primevue/toast";
-import ConfirmPopup from 'primevue/confirmpopup';
 import { useToast } from "primevue/usetoast";
 import { useConfirm } from "primevue/useconfirm";
 
@@ -42,7 +43,7 @@ const toast = useToast();
 const admins = ref([]);
 const adminID=ref()
 
-// API dan adminlarni olish
+
 async function getAdmins() {
   try {
     const response = await axios.get("/api/admin");
@@ -52,15 +53,12 @@ async function getAdmins() {
     console.error("Xatolik:", err);
   }
 }
-
-
-// Sahifa yuklanganda API chaqiramiz
 onMounted(getAdmins);
 
-// Formatlangan adminlar ro‘yxati
 const formattedAdmins = computed(() => {
-  return admins.value.map((admin) => ({
+  return admins.value.map((admin, index) => ({
     ...admin,
+    order:index + 1,
     formattedDate: new Date(admin.createdAt).toLocaleString("ru-RU", {
       day: "2-digit",
       month: "2-digit",
@@ -71,13 +69,12 @@ const formattedAdmins = computed(() => {
   }));
 });
 
-// Edit funksiyasi
+
 function editAdmin(admin) {
   console.log("Tahrirlash:", admin);
   alert(`Tahrirlash: ${admin.username}`);
 }
 
-// Delete funksiyasi
 async function deleteAdmin() {
   try {
     await axios.delete(`/api/admin/${adminID.value}`);
