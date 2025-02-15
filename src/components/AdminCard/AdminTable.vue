@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <DataTable :value="formattedAdmins" stripedRows tableStyle="width: 100%">
+    <DataTable :value="formattedAdmins" stripedRows tableStyle="width: 100%;">
        <Column header="ID">
         <template #body="slotProps">
           {{ slotProps.data.order }}
@@ -12,7 +12,7 @@
       <Column field="formattedDate" header="Created At"></Column>
       <Column header="Actions">
         <template #body="slotProps">
-          <button @click="editAdmin(slotProps.data)" class="p-button p-button-sm p-button-text">
+          <button @click="getadminID(slotProps.data._id)" class="p-button p-button-sm p-button-text">
             <i class="pi pi-pencil text-slate-400"></i>
           </button>
           <button @click="(event) => confirm2(event, slotProps.data._id)"  class="p-button p-button-sm p-button-text">
@@ -22,6 +22,60 @@
       </Column>
     </DataTable>
   </div>
+          <Dialog
+        v-model:visible="visible"
+        modal
+        header="Edit Profile"
+        :style="{ width: '25rem' }"
+      >
+        <span class="text-surface-500 dark:text-surface-400 block mb-8"
+          >Update your information.</span
+        >
+        <div class="flex flex-col gap-2 items-center justify-center">
+          <div class="flex flex-col w-full mb-4">
+            <label for="username" class="font-semibold w-24">Name</label>
+            <InputText
+              v-model="editAdminUsername"
+              id="username"
+              class="flex-auto"
+              autocomplete="off"
+            />
+          </div>
+          <div class="flex flex-col w-full mb-4">
+            <label for="lastname" class="font-semibold w-24">Last Name</label>
+            <InputText
+              v-model="editAdminUserSecondname"
+              id="lastname"
+              class="flex-auto"
+              autocomplete="off"
+            />
+          </div>
+          <div class="flex flex-col w-full mb-8">
+            <label for="email" class="font-semibold w-24">Email</label>
+            <InputText
+              v-model="editAdminEmail"
+              id="email"
+              class="flex-auto"
+              autocomplete="off"
+            />
+          </div>
+          <div class="flex w-full gap-2">
+            <Button
+              type="button"
+              label="Cancel"
+              severity="secondary"
+              class="w-[50%]"
+              @click="visible = false"
+            ></Button>
+            <Button
+              type="button"
+              :label="isLoading ? 'Loading...' : 'Edit'"
+              @click="updateAdmin()"
+              class="w-[50%]"
+            ></Button>
+          </div>
+        </div>
+      </Dialog>
     <Toast id="toast"></Toast>
 </template>
 
@@ -31,6 +85,8 @@ import axios from "axios";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Button from "primevue/button";
+import Dialog from "primevue/dialog";
+import InputText from "primevue/inputtext";
 
 
 import Toast from "primevue/toast";
@@ -39,10 +95,14 @@ import { useConfirm } from "primevue/useconfirm";
 
 const confirm = useConfirm();
 const toast = useToast();
+const visible = ref(false);
 
 const admins = ref([]);
 const adminID=ref()
-
+const editAdminUsername = ref('');
+const editAdminUserSecondname = ref('');
+const editAdminEmail = ref('')
+const isLoading = ref(false);
 
 async function getAdmins() {
   try {
@@ -68,25 +128,56 @@ const formattedAdmins = computed(() => {
     }),
   }));
 });
-
-
-function editAdmin(admin) {
-  console.log("Tahrirlash:", admin);
-  alert(`Tahrirlash: ${admin.username}`);
+ 
+function getadminID(id){
+  adminID.value = id;
+  visible.value = true;
+  getAdminById(adminID.value)
 }
 
-async function deleteAdmin() {
-  try {
-    await axios.delete(`/api/admin/${adminID.value}`);
-    admins.value = admins.value.filter((admin) => admin._id !== adminID.value);
-    toast.add({
-        severity: "success",
-        summary: "Success",
-        detail: "Admin O'chirildi",
-        life: 3000,
-      });
-  } catch (error) {
-    console.error("O‘chirishda xatolik:", error);
+function getAdminById(id) {
+  axios
+    .get(`/api/admin/${id}`)
+    .then((response) => {
+      editAdminUsername.value = response.data.username;
+      editAdminUserSecondname.value = response.data.usersecondname;
+      editAdminEmail.value = response.data.email;
+      console.log(response.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+function updateAdmin() {
+    isLoading.value = true;
+  if(!editAdminUsername.value || !editAdminUserSecondname.value || !editAdminEmail.value) {
+    isLoading.value = false;
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Ma\'lumotlarni to\'liq kiriting', life: 3000 });
+    return;
+  }else{
+     axios
+    .put(
+      `/api/admin/${adminID.value}`,{
+        username: editAdminUsername.value,
+        usersecondname: editAdminUserSecondname.value,
+        email: editAdminEmail.value,
+      }
+    )
+    .then((response) => {
+      if(response.status==200){
+        toast.add({ severity:'success', summary: 'Success', detail: 'Admin o\'zgartirildi', life:3000 });
+        console.log(response.data);
+        getAdmins();
+        isLoading.value = false;
+        visible.value = false;
+      }
+      isLoading.value = false;
+    })
+    .catch((err) => {
+      isLoading.value = false;
+      console.log(err);
+    });
   }
 }
 
@@ -111,6 +202,16 @@ const confirm2 = (event, id) => {
         }
     });
 };
+
+
+function checkEditInput() {
+  if(visible.value==false){
+    editAdminEmail.value=""
+    editAdminUsername.value=""
+    editAdminUserSecondname.value=""
+  }
+}
+checkEditInput()
 </script>
 
 <style scoped>

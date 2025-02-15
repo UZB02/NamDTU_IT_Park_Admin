@@ -9,9 +9,9 @@
         class="top w-full flex items-center justify-between"
         style="padding: 0 10px"
       >
-        <div class="left text-xl md:text-[24px] text-slate-400 flex items-center justify-center gap-3">
+        <div class="left text-lg md:text-[24px] text-slate-400 flex items-center justify-center gap-3">
           <h1 @click="router.push('/')" class="text-xl md:text-[28px] text-green-500 font-bold cursor-pointer">Home</h1> /
-          <h1 class="text-xl md:text-[24px] text-slate-400 font-bold">Admins</h1>
+          <h1 class="text-lg md:text-[24px] text-slate-400 font-bold">Admins</h1>
         </div>
         <div class="right flex items-center justify-center gap-3">
            <Button
@@ -30,10 +30,10 @@
       </div>
       <div class="bottom grid grid-cols-1 w-full gap-3">
         <div class="w-full" :class="cardORtable ? 'hidden' : ''">
-         <AdminCard :admins="admins"></AdminCard>
+         <AdminCard></AdminCard>
         </div>
         <div :class="cardORtable ? '' : 'hidden'">
-          <TableComponent :admins="admins"></TableComponent>
+          <TableComponent></TableComponent>
         </div>
       </div>
       </div>
