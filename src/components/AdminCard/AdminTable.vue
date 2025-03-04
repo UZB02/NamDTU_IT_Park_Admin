@@ -80,15 +80,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, defineProps, onMounted, watch } from "vue";
 import axios from "axios";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
-
-
 import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
 import { useConfirm } from "primevue/useconfirm";
@@ -97,28 +95,38 @@ const confirm = useConfirm();
 const toast = useToast();
 const visible = ref(false);
 
-const admins = ref([]);
-const adminID=ref()
-const editAdminUsername = ref('');
-const editAdminUserSecondname = ref('');
-const editAdminEmail = ref('')
+function getAdmins() {
+  axios
+    .get("/api/admin")
+    .then((response) => {
+        dataLoading.value = false;
+      admins.value = response.data;
+      console.log(admins.value);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+getAdmins();
+
+
+const props = defineProps({
+  admins: {
+    type: Array,
+    default: () => [],
+  },
+});
+const adminID = ref();
+const editAdminUsername = ref("");
+const editAdminUserSecondname = ref("");
+const editAdminEmail = ref("");
 const isLoading = ref(false);
 
-async function getAdmins() {
-  try {
-    const response = await axios.get("/api/admin");
-    admins.value = response.data;
-    console.log("Adminlar:", admins.value);
-  } catch (err) {
-    console.error("Xatolik:", err);
-  }
-}
-onMounted(getAdmins);
 
 const formattedAdmins = computed(() => {
-  return admins.value.map((admin, index) => ({
+  return (props.admins || []).map((admin, index) => ({
     ...admin,
-    order:index + 1,
+    order: index + 1,
     formattedDate: new Date(admin.createdAt).toLocaleString("ru-RU", {
       day: "2-digit",
       month: "2-digit",
@@ -128,11 +136,19 @@ const formattedAdmins = computed(() => {
     }),
   }));
 });
- 
-function getadminID(id){
+
+watch(
+  () => props.admins,
+  (newVal) => {
+    console.log("Yangi admins:", newVal);
+  },
+  { immediate: true }
+);
+
+function getadminID(id) {
   adminID.value = id;
   visible.value = true;
-  getAdminById(adminID.value)
+  getAdminById(adminID.value);
 }
 
 function getAdminById(id) {
@@ -150,68 +166,118 @@ function getAdminById(id) {
 }
 
 function updateAdmin() {
-    isLoading.value = true;
-  if(!editAdminUsername.value || !editAdminUserSecondname.value || !editAdminEmail.value) {
+  isLoading.value = true;
+  if (
+    !editAdminUsername.value ||
+    !editAdminUserSecondname.value ||
+    !editAdminEmail.value
+  ) {
     isLoading.value = false;
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Ma\'lumotlarni to\'liq kiriting', life: 3000 });
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Ma'lumotlarni to'liq kiriting",
+      life: 3000,
+    });
     return;
-  }else{
-     axios
-    .put(
-      `/api/admin/${adminID.value}`,{
+  } else {
+    axios
+      .put(`/api/admin/${adminID.value}`, {
         username: editAdminUsername.value,
         usersecondname: editAdminUserSecondname.value,
         email: editAdminEmail.value,
-      }
-    )
-    .then((response) => {
-      if(response.status==200){
-        toast.add({ severity:'success', summary: 'Success', detail: 'Admin o\'zgartirildi', life:3000 });
-        console.log(response.data);
-        getAdmins();
+      })
+      .then((response) => {
+        if (response.status == 200) {
+          toast.add({
+            severity: "success",
+            summary: "Success",
+            detail: "Admin o'zgartirildi",
+            life: 3000,
+          });
+          console.log(response.data);
+          getAdmins();
+          isLoading.value = false;
+          visible.value = false;
+        }
         isLoading.value = false;
-        visible.value = false;
-      }
-      isLoading.value = false;
-    })
-    .catch((err) => {
-      isLoading.value = false;
-      console.log(err);
-    });
+      })
+      .catch((err) => {
+        isLoading.value = false;
+        console.log(err);
+      });
   }
 }
+function deleteAdmin() {
+  if (!adminID.value) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Admin ID not found",
+      life: 3000,
+    });
+    return;
+  }
+
+  axios
+    .delete(`/api/admin/${adminID.value}`)
+    .then((response) => {
+      toast.add({
+        severity: "success",
+        summary: "Deleted",
+        detail: "Admin successfully deleted",
+        life: 3000,
+      });
+      getAdmins(); // Ro'yxatni yangilash
+    })
+    .catch((err) => {
+      console.error("Xatolik:", err);
+      toast.add({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to delete admin",
+        life: 3000,
+      });
+    });
+}
+
 
 const confirm2 = (event, id) => {
-    adminID.value = id; // O'chirish uchun ID ni saqlab qo'yamiz
-    confirm.require({
-        target: event.target, // Target qo'shildi
-        message: 'Do you want to delete this record?',
-        icon: 'pi pi-info-circle',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Delete',
-            severity: 'danger'
-        },
-        accept: deleteAdmin, // Adminni o'chirish
-        reject: () => {
-            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
-        }
-    });
+  adminID.value = id;
+  confirm.require({
+    target: event.target,
+    message: "Do you want to delete this record?",
+    icon: "pi pi-info-circle",
+    rejectProps: {
+      label: "Cancel",
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptProps: {
+      label: "Delete",
+      severity: "danger",
+    },
+    accept: deleteAdmin, // ✅ Endi mavjud funksiyani chaqiradi
+    reject: () => {
+      toast.add({
+        severity: "error",
+        summary: "Rejected",
+        detail: "You have rejected",
+        life: 3000,
+      });
+    },
+  });
 };
 
 
-function checkEditInput() {
-  if(visible.value==false){
-    editAdminEmail.value=""
-    editAdminUsername.value=""
-    editAdminUserSecondname.value=""
+// ✅ `watch()` bilan `checkEditInput()`
+watch(visible, (newVal) => {
+  if (!newVal) {
+    editAdminEmail.value = "";
+    editAdminUsername.value = "";
+    editAdminUserSecondname.value = "";
   }
-}
-checkEditInput()
+});
 </script>
 
 <style scoped>
